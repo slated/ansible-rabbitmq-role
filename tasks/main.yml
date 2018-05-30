@@ -1,0 +1,10 @@
+---
+# tasks file for rabbitmq
+
+- import_tasks: build.yml
+  become: yes
+  tags: [rabbitmq, build]
+
+- import_tasks: deploy.yml
+  become: yes
+  tags: [rabbitmq, deploy]

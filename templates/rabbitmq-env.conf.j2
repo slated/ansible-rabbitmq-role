@@ -1,0 +1,3 @@
+{% for variable_name, value in rabbitmq_conf_env.items()|sort %}
+{{ variable_name|upper() }}={{ value }}
+{% endfor %}

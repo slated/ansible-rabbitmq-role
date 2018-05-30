@@ -1,0 +1,34 @@
+- name: ensure python-software-properties is installed
+  apt: pkg=python-software-properties state=present
+
+- name: RabbitMQ apt repos
+  apt_repository: repo='{{ item }}' state=present
+  with_items:
+  - 'deb https://dl.bintray.com/rabbitmq/debian {{ rabbitmq_distribution }} main'
+  - 'deb https://packages.erlang-solutions.com/ubuntu {{ rabbitmq_distribution }} contrib'
+
+- name: RabbitMQ trusted keys
+  apt_key: url='{{ item }}' state=present
+  with_items:
+    - https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+    - https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
+    
+- name: RabbitMQ packages
+  apt: name={{ item }} update_cache=yes state=present
+  with_items: '{{ rabbitmq_packages }}'
+
+- name: Configure RabbitMQ
+  template:
+    dest: '/etc/rabbitmq/rabbitmq.config'
+    group: 'rabbitmq'
+    mode: 0644
+    owner: 'rabbitmq'
+    src: 'rabbitmq.config.j2'
+  notify: Restart RabbitMQ
+  
+- name: RabbitMQ plugins
+  rabbitmq_plugin: names='{{ rabbitmq_plugins|join(",") }}' state=enabled
+  notify: Restart RabbitMQ
+
+- name: Remove RabbitMQ guest user
+  rabbitmq_user: user=guest state=absent

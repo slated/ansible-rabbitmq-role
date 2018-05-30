@@ -1,0 +1,29 @@
+---
+# Defaults for rabbitmq
+
+rabbitmq_distribution: '{{ ansible_distribution_release }}'
+
+rabbitmq_packages:
+  - erlang
+  - rabbitmq-server
+
+rabbitmq_plugins:
+  - rabbitmq_management
+  - rabbitmq_tracing
+  - rabbitmq_federation
+
+rabbitmq_admin_user:
+  username: admin
+  password: admin
+
+rabbitmq_users:
+  - username: user
+    password: user
+    vhost: user
+
+rabbitmq_listen_address: 127.0.0.1
+rabbitmq_listen_port: 5672
+rabbitmq_memory_high_watermark: .25
+
+rabbitmq_conf_env:
+  RABBITMQ_NODE_IP_ADDRESS: '{{ rabbitmq_listen_address }}'

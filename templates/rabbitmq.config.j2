@@ -1,0 +1,11 @@
+[
+  {rabbit, [
+{% if rabbitmq_listen_address != '' %}
+    {tcp_listeners, [{"{{ rabbitmq_listen_address }}", {{ rabbitmq_listen_port }}}]}
+{% else %}
+    {tcp_listeners, [{{ rabbitmq_listen_port }}]}
+{% endif %}
+  ]},
+  {rabbit, [{vm_memory_high_watermark, {{rabbitmq_memory_high_watermark|default('0.5')}} }]}
+
+].
