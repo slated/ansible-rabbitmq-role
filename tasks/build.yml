@@ -1,34 +1,60 @@
-- name: ensure python-software-properties is installed
-  apt: pkg=python-software-properties state=present
+---
 
-- name: RabbitMQ apt repos
-  apt_repository: repo='{{ item }}' state=present
+- name: Create Rabbit etc & var dirs manually as we only install Rabbit later
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
   with_items:
-  - 'deb https://dl.bintray.com/rabbitmq/debian {{ rabbitmq_distribution }} main'
-  - 'deb https://packages.erlang-solutions.com/ubuntu {{ rabbitmq_distribution }} contrib'
+    - /etc/rabbitmq
+    - /var/lib/rabbitmq
+
+- name: Add Rabbit ENV config file to make sure full hostnames are used
+  template:
+    src: rabbitmq-env.conf.j2
+    dest: /etc/rabbitmq/rabbitmq-env.conf
 
 - name: RabbitMQ trusted keys
-  apt_key: url='{{ item }}' state=present
+  apt_key:
+    url: "{{ item }}"
+    state: present
   with_items:
-    - https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+    - https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
     - https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
-    
+
+- name: RabbitMQ apt repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - "deb https://dl.bintray.com/rabbitmq/debian {{ ansible_distribution_release }} main"
+    - "deb http://binaries.erlang-solutions.com/debian {{ ansible_distribution_release }} contrib"
+
 - name: RabbitMQ packages
-  apt: name={{ item }} update_cache=yes state=present
-  with_items: '{{ rabbitmq_packages }}'
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+    allow_unauthenticated: yes
+  with_items: "{{ rabbitmq_packages }}"
+
+- name: Ensure Rabbitmq service started and enabled
+  service:
+    name: rabbitmq-server
+    enabled: yes
+    state: started
 
 - name: Configure RabbitMQ
   template:
-    dest: '/etc/rabbitmq/rabbitmq.config'
-    group: 'rabbitmq'
+    dest: "/etc/rabbitmq/rabbitmq.config"
+    group: "rabbitmq"
     mode: 0644
-    owner: 'rabbitmq'
+    owner: "rabbitmq"
     src: 'rabbitmq.config.j2'
   notify: Restart RabbitMQ
-  
-- name: RabbitMQ plugins
-  rabbitmq_plugin: names='{{ rabbitmq_plugins|join(",") }}' state=enabled
-  notify: Restart RabbitMQ
 
-- name: Remove RabbitMQ guest user
-  rabbitmq_user: user=guest state=absent
+- name: RabbitMQ plugins
+  rabbitmq_plugin:
+    names: "{{ rabbitmq_plugins|join(',') }}"
+    state: enabled

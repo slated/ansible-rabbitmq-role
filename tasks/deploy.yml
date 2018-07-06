@@ -1,22 +1,37 @@
+---
+
+- name: Remove RabbitMQ guest user
+  rabbitmq_user:
+    user: guest
+    state: absent
 
 - name: RabbitMQ vhosts
-  rabbitmq_vhost: name={{ item.vhost }} state=present
-  with_items: '{{ rabbitmq_users }}'
+  rabbitmq_vhost:
+    name: "{{ item.vhost }}"
+    state: present
+  with_items: "{{ rabbitmq_users }}"
 
-- name: RabbitMQ admin user # give admin access to all vhosts
-  rabbitmq_user: user={{ rabbitmq_admin_user.username }} password={{ rabbitmq_admin_user.password }} tags=administrator vhost={{ item.vhost }} configure_priv=.* write_priv=.* read_priv=.* state=present
-  with_items: '{{ rabbitmq_users }}'
+# give admin access to all vhosts
+- name: RabbitMQ admin user
+  rabbitmq_user:
+    user: "{{ rabbitmq_admin_user.username }}"
+    password: "{{ rabbitmq_admin_user.password }}"
+    tags: administrator
+    vhost: "{{ item.vhost }}"
+    configure_priv: .*
+    write_priv: .*
+    read_priv: .*
+    state: present
+  with_items: "{{ rabbitmq_users }}"
 
 - name: RabbitMQ users
-  rabbitmq_user: user={{ item.username }} password={{ item.password }} tags=monitoring vhost={{ item.vhost }} configure_priv=.* write_priv=.* read_priv=.* state=present
-  with_items: '{{ rabbitmq_users }}'
-
-- name: RabbitMQ environment-specific configuration
-  template:
-    dest: '/etc/rabbitmq/rabbitmq-env.conf'
-    group: 'rabbitmq'
-    mode: 0644
-    owner: 'rabbitmq'
-    src: 'rabbitmq-env.conf.j2'
-  notify: Restart RabbitMQ
-  
+  rabbitmq_user:
+    user: "{{ item.username }}"
+    password: "{{ item.password }}"
+    tags: monitoring
+    vhost: "{{ item.vhost }}"
+    configure_priv: .*
+    write_priv: .*
+    read_priv: .*
+    state: present
+  with_items: "{{ rabbitmq_users }}"
