@@ -7,7 +7,7 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 def test_rabbitmq_server_is_installed(host):
-    rabbitmq_server = host.package('rabbitmq_server')
+    rabbitmq_server = host.package('rabbitmq-server')
 
     assert rabbitmq_server.is_installed
 

@@ -1,4 +1,6 @@
-rabbitmq
+[![Build Status](https://travis-ci.org/slated/ansible-rabbitmq-roles.svg?branch=master)](https://travis-ci.org/slated/ansible-rabbitmq-roles)
+
+Rabbitmq
 ========
 
 Add repos and packages for RabbitMQ. Configure listen addresses,
