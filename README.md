@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/slated/ansible-rabbitmq-roles.svg?branch=master)](https://travis-ci.org/slated/ansible-rabbitmq-roles)
+[![Build Status](https://travis-ci.org/slated/ansible-rabbitmq-role.svg?branch=master)](https://travis-ci.org/slated/ansible-rabbitmq-role)
 
 Rabbitmq
 ========

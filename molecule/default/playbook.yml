@@ -2,4 +2,4 @@
 - name: Converge
   hosts: all
   roles:
-    - role: ansible-rabbitmq-roles
+    - role: ansible-rabbitmq-role
