@@ -5,8 +5,10 @@
     url: "{{ item }}"
     state: present
   with_items:
-    - https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
-    - https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
+    - https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA
+    - https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf77f1eda57ebb1cc
+    - https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey
+    - https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
 
 - name: RabbitMQ apt repos
   apt_repository:
@@ -14,8 +16,8 @@
     state: present
     update_cache: yes
   with_items:
-    - "deb https://dl.bintray.com/rabbitmq/debian {{ ansible_distribution_release }} main"
-    - "deb http://binaries.erlang-solutions.com/debian {{ ansible_distribution_release }} contrib"
+    - "deb http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu {{ ansible_distribution_release }} main"
+    - "deb https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ {{ ansible_distribution_release }} main"
 
 - name: RabbitMQ packages
   apt:
